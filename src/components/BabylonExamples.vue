@@ -10,13 +10,13 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { BasicScene } from '@/BabylonExamples/BasicScene';
+import { PBR } from '@/BabylonExamples/PBR';
 
 export default defineComponent({
   name: 'BabylonExamples',
   mounted(){
     const canvas = document.querySelector("canvas")!;
-    new BasicScene(canvas);
+    new PBR(canvas);
   }
   
 });
