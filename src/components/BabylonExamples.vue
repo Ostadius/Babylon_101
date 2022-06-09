@@ -10,13 +10,13 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { PBR } from '@/BabylonExamples/PBR';
+import { BOMBAKLATT } from '@/BabylonExamples/BOMBAKLATT';
 
 export default defineComponent({
   name: 'BabylonExamples',
   mounted(){
     const canvas = document.querySelector("canvas")!;
-    new PBR(canvas);
+    new BOMBAKLATT(canvas);
   }
   
 });
