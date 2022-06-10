@@ -8,18 +8,32 @@ import {
   PBRMaterial,
   Texture,
   SceneLoader,
+  AbstractMesh,
+  GlowLayer,
+  Light,
+  LightGizmo,
+  GizmoManager,
+  HemisphericLight,
+  Color3,
+  DirectionalLight,
+  PointLight,
+  SpotLight,
+  ShadowGenerator,
 } from "@babylonjs/core";
 import "@babylonjs/loaders";
 
 export class BOMBAKLATT {
   scene: Scene;
   engine: Engine;
+  lightTubes!:AbstractMesh[];
+  models!:AbstractMesh[];
+  ball!:AbstractMesh;
 
   constructor(private canvas: HTMLCanvasElement) {
     this.engine = new Engine(this.canvas, true);
     this.scene = this.CreateScene();
-    this.CreateLayout();
-    this.CreateTank();
+    this.CreateEnvironment();
+    // this.CreateTank();
     this.engine.runRenderLoop(() => {
       this.scene.render();
     });
@@ -31,55 +45,97 @@ export class BOMBAKLATT {
     camera.attachControl();
     camera.speed = 0.3;
     //set environment/skybox from HDRI .env file
-    const envTex = CubeTexture.CreateFromPrefilteredData(
-      "./environment/shang.env",
-      scene);
-    scene.environmentTexture = envTex;
-    scene.environmentIntensity = 1;
-    scene.createDefaultSkybox(envTex, true);
+    // const envTex = CubeTexture.CreateFromPrefilteredData(
+    //   "./environment/shang.env",
+    //   scene);
+    // scene.environmentTexture = envTex;
+    // scene.environmentIntensity = 1;
+    // scene.createDefaultSkybox(envTex, true);
 
     return scene;
   }
-  CreateLayout(): void {
-    const tanks = ["ethan", "methan", "methanol", "water", "methanol", "water", "methanol", "gas", "fluids", "redbull", "ethan", "lastlast", "redbull", "ethan", "lastlast", "redbull", "methan", "lastlast"];
-    const tpr = 3;
-    const cylPosY = 1;
-    // const pyramidObj = { height: 0.5, diameterTop: 0, tessellation: 32, diameterBottom: 2.5 };
-    // //create ground plane and set material
-    // const cylinderDiameter = 2.5
-    const ground = MeshBuilder.CreateGround(
-      "ground",
-      { width: 20, height: 30 },
-      this.scene
+  async CreateEnvironment(): Promise<void> {
+    const {meshes} = await SceneLoader.ImportMeshAsync(
+      "",
+      "./models/",
+      "LightingScene.glb"
+    )
+    this.models = meshes;
+
+    this.lightTubes = meshes.filter(
+      (mesh)=>
+        mesh.name === "lightTube_left" || mesh.name === "lightTube_right"
+      
     );
-    ground.material = this.CreateAsphalt();
-    ground.position.z = 6.5;
-    
-    //loop out tank models
-    const offsetVar = -1
-    for (let i = 0; tanks.length > i; i += tpr) {
-      const tankRow = tanks.slice(i, i + tpr);
-      console.log(tankRow);
-      for (let k = offsetVar; tankRow.length + offsetVar > k; k++) {
+    this.ball = MeshBuilder.CreateSphere("ball", {diameter: 0.6}, this.scene);
 
-        // //cylinder settings
-        // const cylinder = MeshBuilder.CreateCylinder(`cylinder-${i}`, { diameter: cylinderDiameter }, this.scene);
-        // cylinder.material = this.CreateMetal();
-        // cylinder.position = new Vector3(k * (-4), cylPosY, i - 4)
+    this.ball.position = new Vector3(0, 1, -1);
 
-        // // pyramid settings
-        // const pyramid = MeshBuilder.CreateCylinder("pyramid", pyramidObj, this.scene);
-        // pyramid.material = this.CreateMetal();
-        // pyramid.position = new Vector3(k * (-4), 2.25, i - 4);
-        
-      }
+    const glowLayer = new GlowLayer("glowLayer", this.scene);
+    glowLayer.intensity = 0.8
 
-
-
-
-    }
-
+    this.CreateLights();
   }
+
+
+  CreateLights(): void{
+    // const hemiLight = new HemisphericLight(
+    //   "hemiLight",
+    //   new Vector3(0,1,0),
+    //   this.scene)
+    //   //creates horizon of two different colors
+    //   hemiLight.diffuse = new Color3(1,0,0);
+    //   hemiLight.groundColor = new Color3(0,0,1);
+    //   //add specular light gradient
+    //   hemiLight.specular = new Color3(0,1,0);
+    //   //create interactable Gizmo a la blender 
+
+    // const pointLight = new PointLight(
+    //   "pointLight",
+    //   new Vector3(0,2,0),
+    //   this.scene
+    // );
+    // pointLight.diffuse = new Color3(172/255,34,90);
+    // //if I dont assing it the PointLight type it will be a Nullable <Light>
+    // const pointClone = pointLight.clone("pointClone") as PointLight;
+
+    // pointLight.parent = this.lightTubes[0];
+    // pointClone.parent = this.lightTubes[1];
+    //Math.PI == 180 degrees and whatever you divide it by will be the angle of the spotlight
+    const spotLight = new SpotLight("spotLight",new Vector3(0,0.5,-3),new Vector3(0,1,3),Math.PI/2,10,this.scene);
+    spotLight.intensity = 100;
+    // enable shadows for this specific spotlight
+    spotLight.shadowEnabled = true;
+    //give shadow depth by setting the clipping planes of the shadow
+    spotLight.shadowMinZ = 1;    
+    spotLight.shadowMaxZ = 100  ;
+
+    // 1st param map size of shadow 2nd param the light mesh/source
+    const shadowGen = new ShadowGenerator(2048, spotLight);
+    //to increase shadow quality by using below filter 
+    shadowGen.useBlurCloseExponentialShadowMap = true;
+    this.ball.receiveShadows = true;
+    shadowGen.addShadowCaster(this.ball);
+
+    this.models.map(mesh =>{
+      mesh.receiveShadows = true;
+      shadowGen.addShadowCaster(mesh);
+    })
+    this.CreateGizmos(spotLight);
+  }
+  CreateGizmos(customLight:Light): void {
+    const lightGizmo = new LightGizmo();
+    lightGizmo.scaleRatio = 2;
+    lightGizmo.light= customLight;
+
+    const gizmoManager = new GizmoManager(this.scene);
+    gizmoManager.positionGizmoEnabled = true;
+    gizmoManager.rotationGizmoEnabled = true;
+    gizmoManager.usePointerToAttachGizmos  = false;
+    gizmoManager.attachToMesh(lightGizmo.attachedMesh);
+  }
+
+
   CreateAsphalt(): PBRMaterial {
     const pbr = new PBRMaterial("pbr", this.scene);
     pbr.albedoTexture = new Texture(
