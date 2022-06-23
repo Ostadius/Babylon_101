@@ -18,13 +18,13 @@ export class BOMBAKLATT {
   constructor(private canvas: HTMLCanvasElement) {
     this.engine = new Engine(this.canvas, true);
     this.scene = this.CreateScene();
-    this.CreateLayout();
     this.CreateTank();
+    this.CreateLayout();
     this.engine.runRenderLoop(() => {
       this.scene.render();
     });
   }
-
+  
   CreateScene(): Scene {
     const scene = new Scene(this.engine);
     const camera = new FreeCamera("camera", new Vector3(0, 1, -5), this.scene);
@@ -44,6 +44,7 @@ export class BOMBAKLATT {
     const tanks = ["ethan", "methan", "methanol", "water", "methanol", "water", "methanol", "gas", "fluids", "redbull", "ethan", "lastlast", "redbull", "ethan", "lastlast", "redbull", "methan", "lastlast"];
     const tpr = 3;
     const cylPosY = 1;
+    //createTankFunction(tanksPerRow)
     // const pyramidObj = { height: 0.5, diameterTop: 0, tessellation: 32, diameterBottom: 2.5 };
     // //create ground plane and set material
     // const cylinderDiameter = 2.5
