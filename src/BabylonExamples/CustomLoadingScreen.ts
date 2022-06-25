@@ -22,7 +22,7 @@ export class CustomLoadingScreen implements ILoadingScreen{
 
         setTimeout(()=>{
             this.loader.style.display = 'none'
-        },1000)
+        },500)
     }
 
     updateLoadStatus(status:string) :void{

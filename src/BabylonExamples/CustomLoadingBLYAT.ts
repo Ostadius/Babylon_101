@@ -23,6 +23,8 @@ export class CustomLoadingBLYAT {
         this.engine = new Engine(this.canvas, true);
         this.scene = this.CreateScene();
         this.loadingScreen = new CustomLoadingScreen(this.loadingBar, this.percentLoaded, this.loader);
+        // assigning the loading screen that we created to the engine.loadingScreen
+
         this.engine.loadingScreen = this.loadingScreen;
 
         this.engine.displayLoadingUI();
