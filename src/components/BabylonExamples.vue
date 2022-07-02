@@ -10,13 +10,13 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { BOMBAKLATT } from '@/BabylonExamples/BOMBAKLATT';
+import { AnimatedKLATT } from '@/BabylonExamples/AnimatedKLATT';
 
 export default defineComponent({
   name: 'BabylonExamples',
   mounted(){
     const canvas = document.querySelector("canvas")!;
-    new BOMBAKLATT(canvas);
+    new AnimatedKLATT(canvas);
   }
   
 });

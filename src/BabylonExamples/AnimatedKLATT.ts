@@ -7,6 +7,7 @@ import {
     SceneLoader,
     AbstractMesh,
     Animation,
+    Mesh
   } from "@babylonjs/core";
   import "@babylonjs/loaders";
   
@@ -26,16 +27,22 @@ import {
     
     CreateScene(): Scene {
       const scene = new Scene(this.engine);
-      const camera = new FreeCamera("camera", new Vector3(0, 1, -5), this.scene);
+      const camera = new FreeCamera("camera", new Vector3(-2.5, 0, 0), this.scene);
       camera.attachControl();
-      camera.speed = 0.3;
+      camera.minZ = 0.5;
+      camera.speed = 0.5;
+      camera.rotation.y = 1.5;
+  
       //set environment/skybox from HDRI .env file
       const envTex = CubeTexture.CreateFromPrefilteredData(
         "./environment/shang.env",
         scene);
       scene.environmentTexture = envTex;
+      envTex.gammaSpace = false;
+
+      envTex.rotationY = Math.PI / 2;
       scene.environmentIntensity = 1;
-      scene.createDefaultSkybox(envTex, true);
+      scene.createDefaultSkybox(envTex, true, 1000, 0.25);
   
       return scene;
     }
@@ -56,16 +63,36 @@ import {
             this.scene
         );
 
-        meshes[0].position.y = 3;
+        // meshes[0].position.y = 0;
 
-        this.target = meshes[0];
+
+        this.target = Mesh.MergeMeshes(meshes);
+
+        this.CreateAnimations();
     }
 
     CreateAnimations(): void{
       const rotateFrames = [];
       const fps = 60;
 
-      const rotateAnim = new Animation("rotateAnim", "rotation.z",fps, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CONSTANT);
+      const rotateAnim = new Animation(
+        "rotateAnim", 
+        "rotation.x",
+        fps,
+        Animation.ANIMATIONTYPE_FLOAT, 
+        Animation.ANIMATIONLOOPMODE_CYCLE
+        );
+
+        rotateFrames.push({frame:0, value:0});
+        rotateFrames.push({frame:180, value:Math.PI/2});
+
+        rotateAnim.setKeys(rotateFrames);
+
+        this.target.animations.push(rotateAnim);
+
+
+        this.scene.beginAnimation(this.target, 0, 180);
+
 
     }
   }
