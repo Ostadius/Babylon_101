@@ -6,6 +6,7 @@ import {
     CubeTexture,
     SceneLoader,
     AbstractMesh,
+    Animation,
   } from "@babylonjs/core";
   import "@babylonjs/loaders";
   
@@ -60,8 +61,11 @@ import {
         this.target = meshes[0];
     }
 
-    CreateAnumations(): void{
-      
+    CreateAnimations(): void{
+      const rotateFrames = [];
+      const fps = 60;
+
+      const rotateAnim = new Animation("rotateAnim", "rotation.z",fps, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CONSTANT);
 
     }
   }
