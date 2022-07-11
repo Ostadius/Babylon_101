@@ -44,10 +44,10 @@ export class BOMBAKLATT {
     const tanks = ["ethan", "methan", "methanol", "water", "methanol", "water", "methanol", "gas", "fluids", "redbull", "ethan", "lastlast", "redbull", "ethan", "lastlast", "redbull", "methan", "lastlast"];
     const tpr = 3;
     const cylPosY = 1;
-    //createTankFunction(tanksPerRow)
-    // const pyramidObj = { height: 0.5, diameterTop: 0, tessellation: 32, diameterBottom: 2.5 };
-    // //create ground plane and set material
-    // const cylinderDiameter = 2.5
+    // createTankFunction(tanksPerRow)
+    const pyramidObj = { height: 0.5, diameterTop: 0, tessellation: 32, diameterBottom: 2.5 };
+    //create ground plane and set material
+    const cylinderDiameter = 2.5
     const ground = MeshBuilder.CreateGround(
       "ground",
       { width: 20, height: 30 },
@@ -55,7 +55,7 @@ export class BOMBAKLATT {
     );
     ground.material = this.CreateAsphalt();
     ground.position.z = 6.5;
-    
+    //BASIC LAYOUT INCOMING
     //loop out tank models
     const offsetVar = -1
     for (let i = 0; tanks.length > i; i += tpr) {
@@ -63,15 +63,15 @@ export class BOMBAKLATT {
       console.log(tankRow);
       for (let k = offsetVar; tankRow.length + offsetVar > k; k++) {
 
-        // //cylinder settings
-        // const cylinder = MeshBuilder.CreateCylinder(`cylinder-${i}`, { diameter: cylinderDiameter }, this.scene);
-        // cylinder.material = this.CreateMetal();
-        // cylinder.position = new Vector3(k * (-4), cylPosY, i - 4)
+        //cylinder settings
+        const cylinder = MeshBuilder.CreateCylinder(`cylinder-${i}`, { diameter: cylinderDiameter }, this.scene);
+        cylinder.material = this.CreateMetal();
+        cylinder.position = new Vector3(k * (-4), cylPosY, i - 4)
 
-        // // pyramid settings
-        // const pyramid = MeshBuilder.CreateCylinder("pyramid", pyramidObj, this.scene);
-        // pyramid.material = this.CreateMetal();
-        // pyramid.position = new Vector3(k * (-4), 2.25, i - 4);
+        // pyramid settings
+        const pyramid = MeshBuilder.CreateCylinder("pyramid", pyramidObj, this.scene);
+        pyramid.material = this.CreateMetal();
+        pyramid.position = new Vector3(k * (-4), 2.25, i - 4);
         
       }
 
@@ -124,13 +124,13 @@ export class BOMBAKLATT {
     return pbr;
   }
 async CreateTank(): Promise <void> {
-    const models = await SceneLoader.ImportMeshAsync(
-      "", 
-      "./models/", 
-      "tank1.glb");
+    // const models = await SceneLoader.ImportMeshAsync(
+    //   "", 
+    //   "./models/", 
+    //   "tank1.glb");
 
     
-    console.log("models", models);
+    // console.log("models", models);
     
     // SceneLoader.ImportMesh("", "./models/", "tank1.glb", this.scene, (meshes) => {
     //   console.log("meshes", meshes);
